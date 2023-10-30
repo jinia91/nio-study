@@ -1,0 +1,40 @@
+version: "3"
+services:
+  echo-server2:
+    container_name: echo-server2
+    build:
+      dockerfile: echo_server/Dockerfile
+    ports:
+      - "7779:7779"
+    networks:
+      - internal-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1024M
+    environment:
+      JAVA_TOOL_OPTIONS: -Xmx1024m -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=7779 -Dcom.sun.management.jmxremote.rmi.port=7779 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=${HOST_IP:-"0.0.0.0"}
+
+  nio-server2:
+    container_name: nio-server2
+    build:
+      dockerfile: nio_server/Dockerfile
+    ports:
+      - "7777:7777"
+      - "7776:7776"
+    networks:
+      - internal-network
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 1024M
+    environment:
+      JAVA_TOOL_OPTIONS: -Xmx1024m -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=7776 -Dcom.sun.management.jmxremote.rmi.port=7776 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=${HOST_IP:-"0.0.0.0"}
+    depends_on:
+      - echo-server2
+
+networks:
+  internal-network:
+    driver: bridge
